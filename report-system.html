@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报备系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(90deg,  #008cff 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: rgb(255, 255, 255);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffae00;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #ffae00;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-option label {
+            display: block;
+            padding: 10px 15px;
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 0;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            background: #ffae00;
+            color: white;
+            border-color: #ffae00;
+        }
+
+        .radio-option label:hover {
+            border-color: #ffae00;
+        }
+
+        .collapse-section {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .collapse-header {
+            padding: 12px 15px;
+            background: #f8f9fa;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            color: #333;
+            transition: background 0.3s;
+        }
+
+        .collapse-header:hover {
+            background: #e9ecef;
+        }
+
+        .collapse-header.active {
+            background: #ffae00;
+            color: white;
+        }
+
+        .collapse-icon {
+            font-size: 16px;
+            transition: transform 0.3s;
+        }
+
+        .collapse-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .collapse-content {
+            padding: 15px;
+            background: white;
+            display: none;
+        }
+
+        .collapse-content.show {
+            display: block;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .option-btn {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .option-btn:hover {
+            border-color: #ffae00;
+        }
+
+        .option-btn.selected {
+            background: #ffae00;
+            color: white;
+            border-color: #ffae00;
+        }
+
+        .custom-input {
+            margin-top: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #ffae00 0%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #ffae00;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result h3 {
+            color: #ffae00;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .result-text {
+            color: #333;
+            line-height: 1.8;
+            font-size: 15px;
+            white-space: pre-wrap;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            margin-top: 15px;
+        }
+
+        .copy-btn:hover {
+            box-shadow: 0 5px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .datetime-inputs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .datetime-inputs input {
+            flex: 1;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .datetime-inputs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💕 报备系统</h1>
+        
+        <form id="reportForm">
+            <div class="form-group">
+                <label>内容 1：什么时候</label>
+                <div class="collapse-section" onclick="toggleCollapse('collapse1')">
+                    <div class="collapse-header" id="collapse1-header">
+                        <span id="collapse1-title">请选择时间</span>
+                        <span class="collapse-icon" id="collapse1-icon">▼</span>
+                    </div>
+                    <div class="collapse-content" id="collapse1-content">
+                        <div class="btn-group">
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('timeType', '现在', 'collapse1')">现在</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('timeType', '指定时间', 'collapse1')">指定时间</button>
+                        </div>
+                        <div id="customTimeInput" class="custom-input" style="display: none;">
+                            <div class="datetime-inputs">
+                                <input type="date" id="dateInput">
+                                <input type="time" id="timeInput">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="timeType" required>
+            </div>
+
+            <div class="form-group">
+                <label>内容 2：要去做什么</label>
+                <div class="collapse-section" onclick="toggleCollapse('collapse2')">
+                    <div class="collapse-header" id="collapse2-header">
+                        <span id="collapse2-title">请选择做什么</span>
+                        <span class="collapse-icon" id="collapse2-icon">▼</span>
+                    </div>
+                    <div class="collapse-content" id="collapse2-content">
+                        <div class="btn-group">
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('activity', '玩lol', 'collapse2')">玩lol</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('activity', '事务性工作', 'collapse2')">事务性工作</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('activity', '对接', 'collapse2')">对接</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('activity', '开会', 'collapse2')">开会</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('activity', '吃饭', 'collapse2')">吃饭</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('activity', '思考一下', 'collapse2')">思考一下</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('activity', '其他', 'collapse2')">其他</button>
+                        </div>
+                        <div id="customActivityInput" class="custom-input" style="display: none;">
+                            <input type="text" id="customActivity" placeholder="请输入具体内容">
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="activity" required>
+            </div>
+
+            <div class="form-group">
+                <label>内容 3：和谁一起 <span style="color:#999;font-weight:normal;">(可选)</span></label>
+                <div class="collapse-section" onclick="toggleCollapse('collapse3')">
+                    <div class="collapse-header" id="collapse3-header">
+                        <span id="collapse3-title">请选择和谁一起</span>
+                        <span class="collapse-icon" id="collapse3-icon">▼</span>
+                    </div>
+                    <div class="collapse-content" id="collapse3-content">
+                        <div class="btn-group">
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectWithWhom('同事')">同事</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectWithWhom('高中同学')">高中同学</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectWithWhom('初中同学')">初中同学</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectWithWhom('发小')">发小</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectWithWhom('女朋友')">女朋友</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectWithWhom('家人')">家人</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectWithWhom('客户')">客户</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectWithWhom('我自己')">我自己</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectWithWhom('其他')">其他</button>
+                        </div>
+                        
+                        <div id="genderSection" class="custom-input" style="display: none; margin-top: 15px;">
+                            <label style="font-size: 13px; color: #666;">性别构成：</label>
+                            <div class="btn-group">
+                                <button type="button" class="option-btn" onclick="event.stopPropagation(); selectGender('全男生')">全男生</button>
+                                <button type="button" class="option-btn" onclick="event.stopPropagation(); selectGender('有男有女')">有男有女</button>
+                                <button type="button" class="option-btn" onclick="event.stopPropagation(); selectGender('全女生')">全女生</button>
+                            </div>
+                        </div>
+                        
+                        <div id="peopleCountSection" class="custom-input" style="display: none; margin-top: 15px;">
+                            <label style="font-size: 13px; color: #666;">人数：</label>
+                            <div class="btn-group">
+                                <button type="button" class="option-btn" onclick="event.stopPropagation(); selectPeopleCount('1')">1人</button>
+                                <button type="button" class="option-btn" onclick="event.stopPropagation(); selectPeopleCount('2')">2人</button>
+                                <button type="button" class="option-btn" onclick="event.stopPropagation(); selectPeopleCount('3')">3人</button>
+                                <button type="button" class="option-btn" onclick="event.stopPropagation(); selectPeopleCount('4')">4人</button>
+                                <button type="button" class="option-btn" onclick="event.stopPropagation(); selectPeopleCount('5')">5人</button>
+                                <button type="button" class="option-btn" onclick="event.stopPropagation(); selectPeopleCount('很多')">很多人</button>
+                            </div>
+                        </div>
+                        
+                        <div id="customWithWhomInput" class="custom-input" style="display: none;">
+                            <input type="text" id="customWithWhom" placeholder="请输入具体对象">
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="withWhom">
+                <input type="hidden" id="gender">
+                <input type="hidden" id="peopleCount">
+            </div>
+
+            <div class="form-group">
+                <label>内容 4：大概需要几个小时</label>
+                <div class="collapse-section" onclick="toggleCollapse('collapse4')">
+                    <div class="collapse-header" id="collapse4-header">
+                        <span id="collapse4-title">请选择时长</span>
+                        <span class="collapse-icon" id="collapse4-icon">▼</span>
+                    </div>
+                    <div class="collapse-content" id="collapse4-content">
+                        <div class="btn-group">
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('duration', '1', 'collapse4')">1小时</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('duration', '2', 'collapse4')">2小时</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('duration', '3', 'collapse4')">3小时</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('duration', '4', 'collapse4')">4小时</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('duration', '其他', 'collapse4')">其他</button>
+                        </div>
+                        <div id="customDurationInput" class="custom-input" style="display: none;">
+                            <input type="number" id="customDuration" min="0.5" max="24" step="1" placeholder="请输入小时数">
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="duration" required>
+            </div>
+
+            <div class="form-group">
+                <label>内容 5：超时概率</label>
+                <div class="collapse-section" onclick="toggleCollapse('collapse5')">
+                    <div class="collapse-header" id="collapse5-header">
+                        <span id="collapse5-title">请选择超时概率</span>
+                        <span class="collapse-icon" id="collapse5-icon">▼</span>
+                    </div>
+                    <div class="collapse-content" id="collapse5-content">
+                        <div class="btn-group">
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('overtime', '可能会比较久', 'collapse5')">可能会比较久</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('overtime', '应该不会超时', 'collapse5')">应该不会超时</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('overtime', '看情况', 'collapse5')">看情况</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('overtime', '其他', 'collapse5')">其他</button>
+                        </div>
+                        <div id="customOvertimeInput" class="custom-input" style="display: none;">
+                            <input type="text" id="customOvertime" placeholder="请输入超时说明">
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="overtime" required>
+            </div>
+
+            <div class="form-group">
+                <label>结束方式</label>
+                <div class="collapse-section" onclick="toggleCollapse('collapse6')">
+                    <div class="collapse-header" id="collapse6-header">
+                        <span id="collapse6-title">请选择结束方式</span>
+                        <span class="collapse-icon" id="collapse6-icon">▼</span>
+                    </div>
+                    <div class="collapse-content" id="collapse6-content">
+                        <div class="btn-group">
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('ending', '玩完', 'collapse6')">玩完</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('ending', '处理完', 'collapse6')">处理完</button>
+                            <button type="button" class="option-btn" onclick="event.stopPropagation(); selectOption('ending', '结束', 'collapse6')">结束</button>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="ending" required>
+            </div>
+
+            <button type="submit">生成报备内容</button>
+        </form>
+
+        <div class="result" id="result">
+            <h3>生成的报备内容：</h3>
+            <div class="result-text" id="resultText"></div>
+            <button class="copy-btn" onclick="copyResult()">复制内容</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleCollapse(id) {
+            const content = document.getElementById(id + '-content');
+            const header = document.getElementById(id + '-header');
+            const icon = document.getElementById(id + '-icon');
+            
+            content.classList.toggle('show');
+            header.classList.toggle('active');
+            icon.classList.toggle('rotated');
+        }
+
+        function selectOption(fieldName, value, collapseId) {
+            const buttons = document.querySelectorAll('#' + collapseId + '-content .option-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            
+            event.target.classList.add('selected');
+            
+            const hiddenInput = document.getElementById(fieldName);
+            const customInputDiv = document.getElementById('custom' + capitalizeFirstLetter(fieldName) + 'Input');
+            
+            if (customInputDiv) {
+                if (value === '其他') {
+                    customInputDiv.style.display = 'block';
+                    hiddenInput.value = '';
+                } else {
+                    customInputDiv.style.display = 'none';
+                    hiddenInput.value = value;
+                }
+            } else {
+                hiddenInput.value = value;
+            }
+            
+            const titleSpan = document.getElementById(collapseId + '-title');
+            titleSpan.textContent = value === '其他' ? '请输入内容' : value;
+            
+            if (fieldName === 'timeType' && value === '指定时间') {
+                document.getElementById('customTimeInput').style.display = 'block';
+            } else if (fieldName === 'timeType' && value === '现在') {
+                document.getElementById('customTimeInput').style.display = 'none';
+            }
+        }
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        document.getElementById('customActivity').addEventListener('input', function() {
+            document.getElementById('activity').value = this.value.trim();
+            document.getElementById('collapse2-title').textContent = this.value.trim() || '请输入内容';
+        });
+
+        document.getElementById('customWithWhom').addEventListener('input', function() {
+            document.getElementById('withWhom').value = this.value.trim();
+            updateCollapse3Title();
+        });
+
+        function selectWithWhom(value) {
+            const buttons = document.querySelectorAll('#collapse3-content .btn-group:first-child .option-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            const hiddenInput = document.getElementById('withWhom');
+            const customInputDiv = document.getElementById('customWithWhomInput');
+            const genderSection = document.getElementById('genderSection');
+            const peopleCountSection = document.getElementById('peopleCountSection');
+            
+            if (value === '其他') {
+                customInputDiv.style.display = 'block';
+                genderSection.style.display = 'none';
+                peopleCountSection.style.display = 'none';
+                hiddenInput.value = '';
+                document.getElementById('gender').value = '';
+                document.getElementById('peopleCount').value = '';
+            } else if (value === '女朋友' || value === '家人' || value === '客户' || value === '我自己') {
+                customInputDiv.style.display = 'none';
+                genderSection.style.display = 'none';
+                peopleCountSection.style.display = 'none';
+                hiddenInput.value = value;
+                document.getElementById('gender').value = '';
+                document.getElementById('peopleCount').value = '';
+            } else {
+                customInputDiv.style.display = 'none';
+                genderSection.style.display = 'block';
+                peopleCountSection.style.display = 'block';
+                hiddenInput.value = value;
+                document.getElementById('gender').value = '';
+                document.getElementById('peopleCount').value = '';
+                
+                const genderButtons = document.querySelectorAll('#genderSection .option-btn');
+                genderButtons.forEach(btn => btn.classList.remove('selected'));
+                const countButtons = document.querySelectorAll('#peopleCountSection .option-btn');
+                countButtons.forEach(btn => btn.classList.remove('selected'));
+            }
+            
+            updateCollapse3Title();
+        }
+
+        function selectGender(value) {
+            const buttons = document.querySelectorAll('#genderSection .option-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            document.getElementById('gender').value = value;
+            updateCollapse3Title();
+        }
+
+        function selectPeopleCount(value) {
+            const buttons = document.querySelectorAll('#peopleCountSection .option-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            document.getElementById('peopleCount').value = value;
+            updateCollapse3Title();
+        }
+
+        function updateCollapse3Title() {
+            const withWhom = document.getElementById('withWhom').value;
+            const gender = document.getElementById('gender').value;
+            const peopleCount = document.getElementById('peopleCount').value;
+            
+            let title = '';
+            if (withWhom) {
+                title = withWhom;
+                if (gender && peopleCount) {
+                    title += `(${gender}${peopleCount === '很多' ? '很多人' : peopleCount + '人'})`;
+                } else if (gender) {
+                    title += `(${gender})`;
+                } else if (peopleCount) {
+                    title += `(${peopleCount === '很多' ? '很多人' : peopleCount + '人'})`;
+                }
+            }
+            
+            document.getElementById('collapse3-title').textContent = title || '请选择和谁一起';
+        }
+
+        document.getElementById('customDuration').addEventListener('input', function() {
+            document.getElementById('duration').value = this.value.trim();
+            document.getElementById('collapse4-title').textContent = (this.value.trim() + '小时') || '请输入内容';
+        });
+
+        document.getElementById('customOvertime').addEventListener('input', function() {
+            document.getElementById('overtime').value = this.value.trim();
+            document.getElementById('collapse5-title').textContent = this.value.trim() || '请输入内容';
+        });
+
+        function formatDate(dateStr, timeStr) {
+            const date = new Date(dateStr);
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const hour = timeStr.split(':')[0];
+            const minute = timeStr.split(':')[1];
+            
+            const today = new Date();
+            const isToday = date.getDate() === today.getDate() && 
+                           date.getMonth() === today.getMonth() && 
+                           date.getFullYear() === today.getFullYear();
+            
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const isTomorrow = date.getDate() === tomorrow.getDate() && 
+                              date.getMonth() === tomorrow.getMonth() && 
+                              date.getFullYear() === tomorrow.getFullYear();
+            
+            if (isToday) {
+                return `今天${hour}点${minute}`;
+            } else if (isTomorrow) {
+                return `明天${hour}点${minute}`;
+            } else {
+                return `${month}月${day}日${hour}点${minute}`;
+            }
+        }
+
+        document.getElementById('reportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const timeType = document.getElementById('timeType').value;
+            let timeStr = '';
+            
+            if (timeType === '现在') {
+                timeStr = '现在';
+            } else if (timeType === '指定时间') {
+                const dateInput = document.getElementById('dateInput').value;
+                const timeInput = document.getElementById('timeInput').value;
+                
+                if (!dateInput || !timeInput) {
+                    alert('请选择日期和时间');
+                    return;
+                }
+                
+                timeStr = formatDate(dateInput, timeInput);
+            } else {
+                alert('请选择时间');
+                return;
+            }
+            
+            const activity = document.getElementById('activity').value.trim();
+            const withWhom = document.getElementById('withWhom').value.trim();
+            const gender = document.getElementById('gender').value.trim();
+            const peopleCount = document.getElementById('peopleCount').value.trim();
+            const duration = document.getElementById('duration').value;
+            const overtime = document.getElementById('overtime').value.trim();
+            const ending = document.getElementById('ending').value;
+            
+            if (!activity) {
+                alert('请选择或输入要做什么');
+                return;
+            }
+            if (!duration) {
+                alert('请选择或输入时长');
+                return;
+            }
+            if (!overtime) {
+                alert('请选择或输入超时概率');
+                return;
+            }
+            if (!ending) {
+                alert('请选择结束方式');
+                return;
+            }
+            
+            let withWhomStr = '';
+            if (withWhom) {
+                withWhomStr = '和';
+                if (gender && peopleCount) {
+                    withWhomStr += `${gender}${peopleCount === '很多' ? '很多' : peopleCount + '个'}${withWhom}`;
+                } else if (gender) {
+                    withWhomStr += `${gender}${withWhom}`;
+                } else if (peopleCount) {
+                    withWhomStr += `${peopleCount === '很多' ? '很多' : peopleCount + '个'}${withWhom}`;
+                } else {
+                    withWhomStr += withWhom;
+                }
+                withWhomStr += '一起';
+            }
+            
+            const result = `宝宝，${timeStr}我要去${activity}${withWhomStr}，大概需要${duration}个小时，${overtime}，等我${ending}再找你，等我好了我会给你发消息的宝宝，爱你！`;
+            
+            document.getElementById('resultText').textContent = result;
+            document.getElementById('result').classList.add('show');
+        });
+
+        function copyResult() {
+            const resultText = document.getElementById('resultText').textContent;
+            navigator.clipboard.writeText(resultText).then(() => {
+                const copyBtn = document.querySelector('.copy-btn');
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✓ 已复制';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                alert('复制失败，请手动复制');
+            });
+        }
+
+        // 设置日期输入框的最小值为今天
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('dateInput').setAttribute('min', today);
+    </script>
+</body>
+</html>
